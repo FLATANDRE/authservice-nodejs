@@ -1,23 +1,13 @@
-var session = require('express-session');
-var keycloak = require('keycloak-connect');
-
+var Keycloak = require('keycloak-connect');
+var keycloakConfig = require('../keycloak_config.json');
 let keycloakConn;
 
-var keycloakConfig = {
-    clientId: 'nodejs-microservice',
-    bearerOnly: true,
-    serverUrl: 'http://localhost:8080/auth',
-    realm: 'tech-blog',
-    realmPublicKey: '1234567890abcdef'
-};
-
-function initKeycloak() {
+function initKeycloak(memStore) {
     if (keycloakConn) {   
         return keycloakConn;
     }
 
     console.log('Initializing keycloak...');    
-    var memStore = new session.MemoryStore();
     keycloakConn = new Keycloak({store : memStore}, keycloakConfig);
     return keycloakConn;
 }
