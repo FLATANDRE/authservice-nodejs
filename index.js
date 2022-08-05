@@ -4,10 +4,14 @@ var app = express();
 const memStore = new session.MemoryStore();
 const keycloak = require('./config/keycloak-config.js').initKeycloak(memStore);
 const controllers = require('./controller/controllers');
+const dotenv = require('dotenv');
+dotenv.config();
+
+const PORT = process.env.PORT;
 
 app.use(
     session({
-        secret: 'apiauthbasedkeycloak',
+        secret: process.env.SESSION_SECRET,
         resave: false,
         saveUninitialized: true,
         store: memStore
@@ -20,7 +24,7 @@ app.use('/test', controllers.testController);
 
 
 app.get('/', function(req, res){
-   res.send("Server is up!");
+   res.send("AuthService API - with Keycloak integration");
 });
 
-app.listen(3000);
+app.listen(PORT);

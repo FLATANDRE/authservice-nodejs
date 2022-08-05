@@ -9,7 +9,7 @@ function initKeycloak(memStore) {
     }
 
     console.log('Initializing keycloak...');    
-    keycloakConn = new Keycloak({store : memStore}, chekEnvConfig());
+    keycloakConn = new Keycloak({store : memStore},checkEnvConfig() );
     return keycloakConn;
 }
 
@@ -20,11 +20,11 @@ function getKeycloak(params) {
     return keycloakConn;
 }
 
-function chekEnvConfig() {
+function checkEnvConfig() {
     if (isProduction()) {
-        return require('../keycloak_config.prod.json');
+        return require('./keycloak_config.prod.json');
     }
-    return require('../keycloak_config.dev.json');
+    return require('./keycloak_config.dev.json');
 }
 
 module.exports = {

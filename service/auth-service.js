@@ -1,3 +1,5 @@
+const { parseJwt } = require("../util/env-functions");
+
 class AuthService {
 
     constructor(keycloakService) {
@@ -5,12 +7,12 @@ class AuthService {
 
     }
 
-    login (username, password) {
-        return this.keycloakService.getToken();
+    async login (username, password) {
+        return await this.keycloakService.getToken(username,password);
     }
 
-    getUserInfo (username) {
-        return this.keycloakService.getUserInfo();
+    async getUserInfo (token) {
+        return await this.keycloakService.getUserInfo(token);
     }
 
     logout () {

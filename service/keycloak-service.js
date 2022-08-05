@@ -1,40 +1,62 @@
-var request = require('request');
+var axios = require('axios').default;
+const qs = require('qs');
+const dotenv = require('dotenv');
+dotenv.config();
 
 class KeycloakService {
 
-    constructor(kcAdminClient) {
-        this.kcAdminClient = kcAdminClient;
+    appRealm = process.env.KEYCLOAK_APP_REALM; 
+    baseUrl = process.env.KEYCLOAK_BASE_URL;
+
+    formUrlEncodedHeader = { 
+        'Content-Type': 'application/x-www-form-urlencoded'
+    };
+
+    defaultForm = {         
+        'client_id': process.env.KEYCLOAK_CLIENT_ID,
+        'client_secret': process.env.KEYCLOAK_CLIENT_SECRET,
+        'username': '',
+        'password': '',
+        'grant_type': process.env.KEYCLOAK_GRANT_TYPE,
+    };
+
+    constructor() {
     }
 
-    getToken() {   
-        /*var options = {
-            'method': 'POST',
-            'url': 'http://127.0.0.1:8080/realms/heroes/protocol/openid-connect/token',
-            'headers': {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            form: {
-              'client_id': 'admin-cli',
-              'username': 'thor',
-              'password': 'thor',
-              'grant_type': 'password'
-            }
-          };
-          */
-          request(options, function (error, response) {
-            if (error) throw new Error(error);
-            console.log(response.body);
-          });
-        return {auth_token : 'asfksdglçdfkgdfgdfgdfgdfgdfgdfgdfgdfgdfgdfgdfgdfgdf'};
-    }
+    async getToken(username,password) {   
+        const tokenUrl = `/auth/realms/${this.appRealm}/protocol/openid-connect/token`;
 
-    getUserInfo() {
-        return {
-            email : 'teste@gmail.com',
-            name : 'Teste',
-            username : 'teste@gmail.com',
-            roles : ['admin', 'user']
+        this.defaultForm.username = username;
+        this.defaultForm.password = password;
+
+        const options = {
+            headers: this.formUrlEncodedHeader,            
         };
+          
+        return axios
+            .post(`${this.baseUrl}${tokenUrl}`,qs.stringify(this.defaultForm),options)
+            .then(res => {            
+                return res.data;
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
+    async getUserInfo(token) {
+        const profileUrl = `/auth/realms/${this.appRealm}/protocol/openid-connect/userinfo`;
+        const options = {
+            headers: { Authorization : token },            
+        };
+
+        return axios
+            .get(`${this.baseUrl}${profileUrl}`,options)
+            .then(res => {
+                return res.data;
+            })
+            .catch(err => {
+                console.log(err);
+            });
     }
 
     logOut() {
