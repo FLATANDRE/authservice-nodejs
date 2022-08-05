@@ -14,7 +14,7 @@ router.get('/admin', keycloak.protect('admin'), function(req, res){
     res.send("Hello Admin");
 });
 
-router.get('/all-user', keycloak.protect(['app-user','app-admin']), function(req, res){
+router.get('/all-user', keycloak.protect(['user','admin']), function(req, res){
     res.send("Hello All User");
 });
 

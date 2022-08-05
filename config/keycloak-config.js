@@ -1,5 +1,6 @@
 var Keycloak = require('keycloak-connect');
-var keycloakConfig = require('../keycloak_config.json');
+const { isProduction } = require('../util/env-functions');
+
 let keycloakConn;
 
 function initKeycloak(memStore) {
@@ -8,7 +9,7 @@ function initKeycloak(memStore) {
     }
 
     console.log('Initializing keycloak...');    
-    keycloakConn = new Keycloak({store : memStore}, keycloakConfig);
+    keycloakConn = new Keycloak({store : memStore}, chekEnvConfig());
     return keycloakConn;
 }
 
@@ -17,6 +18,13 @@ function getKeycloak(params) {
         console.error('No keycloak connection available');
     }
     return keycloakConn;
+}
+
+function chekEnvConfig() {
+    if (isProduction()) {
+        return require('../keycloak_config.prod.json');
+    }
+    return require('../keycloak_config.dev.json');
 }
 
 module.exports = {
