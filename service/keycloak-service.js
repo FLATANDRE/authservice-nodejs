@@ -6,10 +6,10 @@ dotenv.config();
 class KeycloakService {
 
     appRealm = process.env.KEYCLOAK_APP_REALM; 
-    baseUrl = process.env.KEYCLOAK_BASE_URL;
+    baseUrl = process.env.KEYCLOAK_BASE_URL + `/auth/realms/${this.appRealm}/protocol/openid-connect`;
 
     formUrlEncodedHeader = { 
-        'Content-Type': 'application/x-www-form-urlencoded'
+        'Content-Type' : 'application/x-www-form-urlencoded'
     };
 
     defaultForm = {         
@@ -24,7 +24,7 @@ class KeycloakService {
     }
 
     async getToken(username,password) {   
-        const tokenUrl = `/auth/realms/${this.appRealm}/protocol/openid-connect/token`;
+        const tokenUrl = '/token';
 
         this.defaultForm.username = username;
         this.defaultForm.password = password;
@@ -44,7 +44,7 @@ class KeycloakService {
     }
 
     async getUserInfo(token) {
-        const profileUrl = `/auth/realms/${this.appRealm}/protocol/openid-connect/userinfo`;
+        const profileUrl = '/userinfo';
         const options = {
             headers: { Authorization : token },            
         };
@@ -59,8 +59,20 @@ class KeycloakService {
             });
     }
 
-    logOut() {
-        return true;
+    async logout(token,idToken) {
+        const logout = `/logout?id_token_hint=${idToken}`;
+        const options = {
+            headers: { Authorization : token },            
+        };
+
+        return axios
+            .get(`${this.baseUrl}${logout}`,options)
+            .then(res => {
+                return res.data;
+            })
+            .catch(err => {
+                console.log(err);
+            });
     }
 }
 

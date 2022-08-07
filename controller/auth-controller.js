@@ -24,8 +24,11 @@ router.get('/user-info', keycloak.protect('user'), function(req, res){
 });
 
 router.get('/logout', keycloak.protect('user'), function(req, res){
-    const isLoggedOut = authService.logout();
-    res.send(isLoggedOut);    
+    authService
+    .logout(req.headers.authorization,req.query.idToken)
+    .then(user => {
+        res.send(user);
+    });
 });
 
 module.exports = router;
